@@ -1,0 +1,56 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - .azuredevops/templates/stages/nonprod-roles.yml
+      # - .azuredevops/templates/stages/prod-roles.yml
+
+variables:
+  - name: serviceConnectionDev
+    value: azurerm-apim-dev-001
+  # - name: serviceConnectionNonProd
+  #   value: azurerm-apim-nonprod-001
+  # - name: serviceConnectionProd
+  #   value: azurerm-apim-prod-001
+
+stages:
+
+  # ---------------------------------------------------------------------------
+  # Dev Environment
+  # ---------------------------------------------------------------------------
+
+  - template: templates/stages/nonprod-roles.yml@Self
+    parameters:
+      environment: dev
+      serviceConnection: ${{ variables.serviceConnectionDev }}
+
+  # ---------------------------------------------------------------------------
+  # NonProd Environment
+  # ---------------------------------------------------------------------------
+
+  # - template: templates/stages/nonprod-roles.yml@Self
+  #   parameters:
+  #     environment: nonprod
+  #     serviceConnection: ${{ variables.serviceConnectionNonProd }}
+
+    # ---------------------------------------------------------------------------
+    # Prod Environment
+    # ---------------------------------------------------------------------------
+
+  # - template: templates/stages/snow-raise.yml@Self
+  #   parameters:
+  #     environment: prod
+  #     serviceNowServiceConnection: ${{ variables.serviceNowServiceConnection }}
+
+  # - template: templates/stages/prod-roles.yml@Self
+  #   parameters:
+  #     environment: prod
+  #     serviceConnection: ${{ variables.serviceConnectionProd }}
+
+  # - template: templates/stages/snow-release.yml@Self
+  #   parameters:
+  #     environment: prod
+  #     serviceNowServiceConnection: ${{ variables.serviceNowServiceConnection }}

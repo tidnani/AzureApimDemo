@@ -1,0 +1,70 @@
+parameters:
+  - name: environment
+    type: string
+  - name: serviceConnection
+    type: string
+
+stages:
+- stage: 'roles_${{ parameters.environment }}'
+  displayName: 'roles_${{ parameters.environment }}'
+  pool:
+    vmImage: 'windows-latest'
+  variables:          
+    - template: ../variables/${{ parameters.environment }}.yml@Self
+  jobs:
+  - job: RoleAssignments_${{ parameters.environment }}
+    steps:
+    - task: AzurePowerShell@4
+      displayName: AddApiRoleAssignments_${{ parameters.environment }}
+      inputs:
+        azureSubscription: ${{ parameters.serviceConnection }}
+        ScriptType: inlineScript
+        Inline: |
+
+          . "$(System.DefaultWorkingDirectory)\.azuredevops\templates\stages\roles.ps1"
+
+          ##########################
+          ### Please add/remove as required
+          ##########################
+
+          if ( "$(environment)" -ieq "dev" ) {
+            Write-Host "Assigning roles"
+            # api-weather sp-cas-sbx-001 reference implementation
+            Assign-ApiRole -objectId "ae7e341b-57a3-40b3-9e22-7912e8dc65c1" -apiName "api-hello"
+
+          }
+
+          if ( "$(environment)" -ieq "nonprod" ) {
+          
+            #Assign-ApiRole -objectId "" -apiName "" 
+          
+          }
+
+        azurePowerShellVersion: 'LatestVersion'
+
+    - task: AzurePowerShell@4
+      displayName: RemoveApiRoleAssignments_${{ parameters.environment }}
+      inputs:
+        azureSubscription: ${{ parameters.serviceConnection }}
+        ScriptType: inlineScript
+        Inline: |
+
+          . "$(System.DefaultWorkingDirectory)\.azuredevops\templates\stages\roles.ps1"
+
+          ##########################
+          ### Please add/remove as required
+          ##########################
+
+          if ( "$(environment)" -ieq "dev" ) {
+
+            #Remove-ApiRole -objectId "" -apiName "" -productName ""
+ 
+          }
+
+          if ( "$(environment)" -ieq "nonprod" ) {
+          
+            #Remove-ApiRole -objectId "" -apiName "" -productName ""
+          
+          }
+
+        azurePowerShellVersion: 'LatestVersion'

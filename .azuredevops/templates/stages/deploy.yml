@@ -1,0 +1,45 @@
+parameters:
+  - name: environment
+    type: string
+  - name: serviceConnection
+    type: string
+
+stages:
+- stage: 'deploy_${{ parameters.environment }}'
+  displayName: 'deploy_${{ parameters.environment }}'
+  pool:
+    vmImage: 'windows-latest'
+  variables:          
+    - template: ../variables/${{ parameters.environment }}.yml@Self
+  jobs:
+  - job: DeployARMTemplates
+    displayName: Deploy ARM Templates
+    steps:
+    - task: DownloadBuildArtifacts@0
+      displayName: Download Built ARM Templates
+      inputs:
+        buildType: "current"
+        downloadType: "single"
+        artifactName: "BuiltARMTemplates"
+        downloadPath: "$(System.DefaultWorkingDirectory)"
+    
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: 'Deploy APIM ARM Template'
+      inputs:
+        deploymentScope: Resource Group
+        azureResourceManagerConnection: ${{ parameters.serviceConnection }}
+        subscriptionId: $(subscriptionId)
+        action: Create Or Update Resource Group
+        resourceGroupName: $(azureResourceGroup)
+        location: $(location)
+        templateLocation: Linked artifact
+        csmFile: "BuiltARMTemplates/apim.json"
+        deploymentMode: Incremental
+        overrideParameters: >-
+          -environment $(environment)
+          -tags {"owner": "$(owner)", "application": "$(application)", "description": "$(description)", "repo": "$(repo)"}
+          -apimName $(apimName)
+          -sku $(apimSku)
+          -publisherEmail $(publisherEmail)
+          -publisherName $(publisherName)
+          -apimRestoreFlag $(apimRestoreFlag)

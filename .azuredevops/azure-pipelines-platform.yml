@@ -1,0 +1,55 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - infra/*
+
+variables:
+  - name: serviceConnectionDev
+    value: azurerm-apim-dev-001
+  # - name: serviceConnectionNonProd
+  #   value: azurerm-apim-nonprod-001
+  # - name: serviceConnectionProd
+  #   value: azurerm-apim-prod-001
+
+stages:
+  - template: templates/stages/bicep.yml@Self
+
+  # ---------------------------------------------------------------------------
+  # Validation
+  # ---------------------------------------------------------------------------
+
+  - template: templates/stages/validate.yml@Self
+    parameters:
+      environment: dev
+      serviceConnection: ${{ variables.serviceConnectionDev }}
+
+  # ---------------------------------------------------------------------------
+  # Dev Environment
+  # ---------------------------------------------------------------------------
+
+  - template: templates/stages/deploy.yml@Self
+    parameters:
+      environment: dev
+      serviceConnection: ${{ variables.serviceConnectionDev }}
+
+  # ---------------------------------------------------------------------------
+  # NonProd Environment
+  # ---------------------------------------------------------------------------
+
+  # - template: templates/stages/deploy.yml@Self
+  #   parameters:
+  #     environment: nonprod
+  #     serviceConnection: ${{ variables.serviceConnectionNonProd }}
+
+  # ---------------------------------------------------------------------------
+  # Prod Environment
+  # ---------------------------------------------------------------------------
+
+  #   - template: templates/stages/deploy.yml@Self
+  #     parameters:
+  #       environment: prod
+  #       serviceConnection: ${{ variables.serviceConnectionProd }}

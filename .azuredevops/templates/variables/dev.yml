@@ -1,0 +1,30 @@
+variables:
+
+  - name: azureResourceGroup
+    value: 'apiManagementGroup'
+  - name: subscriptionId
+    value: 'd473e026-18c5-47ae-a49e-ab3ae15846cb'
+
+  - name: owner
+    value: 'tidnani0309@gmail.com'
+  - name: application
+    value: 'Api Management Demo'
+  - name: description
+    value: 'Api Management Platform Demo'
+  - name: repo
+    value: 'https://dev.azure.com/tidnani163/TestAzureDevOps/_git/ApimDemo'
+  - name: environment
+    value: 'dev'
+
+  - name: apimName
+    value: 'apim-demo-$(environment)-0001'
+  - name: apimSku
+    value: Consumption
+
+  - name: publisherEmail
+    value: 'tidnani0309@gmail.com'
+  - name: publisherName
+    value: 'APIPlatform'
+
+  - name: apimRestoreFlag
+    value: 'false'
